@@ -3,7 +3,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const userInput = document.getElementById("user-input");
   const sendButton = document.getElementById("send-button");
 
-  // Função para adicionar mensagem ao chat
+  /**
+   * @param {string} message
+   * @param {bool} isUser
+   */
   function addMessage(message, isUser) {
     const messageDiv = document.createElement("div");
     messageDiv.classList.add("message");
@@ -16,11 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
     messageDiv.appendChild(messageContent);
     chatMessages.appendChild(messageDiv);
 
-    // Rolar para a mensagem mais recente
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Função para simular digitação (efeito de aguardando resposta)
   function showTypingIndicator() {
     const typingDiv = document.createElement("div");
     typingDiv.classList.add("message", "bot", "typing-indicator");
@@ -36,9 +37,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return typingDiv;
   }
 
-  // Função para enviar mensagem do usuário para o backend
+  /**
+   * @param {string} message
+   * */
   async function sendMessage(message) {
-    // Mostrar indicador de digitação
     const typingIndicator = showTypingIndicator();
 
     try {
@@ -52,14 +54,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const data = await response.json();
 
-      // Remover indicador de digitação
       chatMessages.removeChild(typingIndicator);
 
-      // Adicionar resposta do bot ao chat
       addMessage(data.response, false);
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error);
-      // Remover indicador de digitação
       chatMessages.removeChild(typingIndicator);
       addMessage(
         "Desculpe, ocorreu um erro na comunicação. Tente novamente mais tarde.",
@@ -68,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Event listener para o botão de enviar
   sendButton.addEventListener("click", function () {
     const message = userInput.value.trim();
     if (message) {
@@ -78,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Event listener para tecla Enter
   userInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
       const message = userInput.value.trim();
@@ -90,8 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Sugestões de perguntas comuns
-  const sugestoes = [
+  const suggestions = [
     "Minha internet está lenta",
     "Esqueci minha senha",
     "Problemas com impressora",
@@ -99,35 +95,33 @@ document.addEventListener("DOMContentLoaded", function () {
     "Não consigo acessar meu email",
   ];
 
-  // Adicionar sugestões iniciais após um curto delay
   setTimeout(() => {
     addMessage(
       "Aqui estão alguns problemas comuns que posso ajudar a resolver:",
       false,
     );
 
-    const sugestoesDiv = document.createElement("div");
-    sugestoesDiv.classList.add("message", "bot");
+    const suggestionsDiv = document.createElement("div");
+    suggestionsDiv.classList.add("message", "bot");
 
-    const sugestoesContent = document.createElement("div");
-    sugestoesContent.classList.add("message-content", "sugestoes");
+    const suggestionsContent = document.createElement("div");
+    suggestionsContent.classList.add("message-content", "suggestions");
 
-    sugestoes.forEach((sugestao) => {
+    suggestions.forEach((suggestion) => {
       const btn = document.createElement("button");
-      btn.classList.add("sugestao-btn");
-      btn.textContent = sugestao;
+      btn.classList.add("suggestion-btn");
+      btn.textContent = suggestion;
       btn.addEventListener("click", () => {
-        addMessage(sugestao, true);
-        sendMessage(sugestao);
+        addMessage(suggestion, true);
+        sendMessage(suggestion);
       });
-      sugestoesContent.appendChild(btn);
+      suggestionsContent.appendChild(btn);
     });
 
-    sugestoesDiv.appendChild(sugestoesContent);
-    chatMessages.appendChild(sugestoesDiv);
+    suggestionsDiv.appendChild(suggestionsContent);
+    chatMessages.appendChild(suggestionsDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }, 1000);
 
-  // Foco inicial no campo de input
   userInput.focus();
 });
