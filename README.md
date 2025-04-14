@@ -1,19 +1,19 @@
-# Chatbot de suporte técnico
+# 🤖 Chatbot para suporte técnico
 
-## Como rodar
+Este é um projeto simples de chatbot utilizando Python, Flask e NLTK
+
+## 🚀 Como rodar o projeto
 
 ```bash
-python -m venv .venv
+docker-compose up -d --build
 ```
+## Como parar de rodar o projeto
 
-```bash
-source ./.venv/bin/activate
+ ```bash
+docker-compose down
 ```
+### 1. Clone o repositório
 
 ```bash
-pip install -r requirements.txt
-```
-
-```bash
-flask run --debug
+git clone https://github.com/seu-usuario/chatbot-nltk.git
 ```

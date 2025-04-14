@@ -4,9 +4,9 @@ import random
 import string
 from nltk.stem import WordNetLemmatizer
 
-nltk.download("punkt")  # tokenization
-nltk.download("wordnet")  # Lemmatization
-nltk.download("omw-1.4")  # portuguese Lemmatization
+nltk.download("punkt")  
+nltk.download("wordnet")  
+nltk.download("omw-1.4")  
 
 
 class ChatBot:
