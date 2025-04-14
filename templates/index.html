@@ -1,0 +1,40 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot de Suporte Técnico</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>Suporte Técnico Online</h1>
+        <p>Tire suas dúvidas e resolva problemas rapidamente</p>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message bot">
+          <div class="message-content">
+            Olá! Sou o assistente virtual de suporte técnico. Como posso ajudar
+            você hoje? Estou aqui para ajudar com problemas de internet,
+            computador lento, impressora, email, senhas e muito mais.
+          </div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Descreva seu problema técnico..."
+          autofocus
+        />
+        <button id="send-button">Enviar</button>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
