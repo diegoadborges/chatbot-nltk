@@ -90,9 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const suggestions = [
     "Minha internet está lenta",
     "Esqueci minha senha",
-    "Problemas com impressora",
-    "Computador travando",
-    "Não consigo acessar meu email",
+    "Impressora não funciona",
+    "Como formatar computador",
   ];
 
   setTimeout(() => {

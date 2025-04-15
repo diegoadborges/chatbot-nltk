@@ -1,9 +1,8 @@
 from flask import Flask, Response, render_template, request, jsonify
-from chatbot import ChatBot
+
+from chatbot import get_response
 
 app = Flask(__name__)
-
-chatbot = ChatBot()
 
 
 @app.route("/")
@@ -18,7 +17,7 @@ def message() -> Response:
         return jsonify("body cannot be empty", 422)
 
     user_message = request_body.get("message", "")
-    response = chatbot.answer(user_message)
+    response = get_response(user_message)
     return jsonify({"response": response})
 
 

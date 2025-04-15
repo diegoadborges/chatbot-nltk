@@ -1,184 +1,163 @@
-from typing import List
-import nltk
-import random
-import string
-from nltk.stem import WordNetLemmatizer
+from nltk.chat.util import Chat
 
-nltk.download("punkt")  # Tokenizer
-nltk.download("wordnet")  # English lemmatizer
-nltk.download("omw-1.4")  # Portuguese lemmatizer
+pares = [
+    [
+        r"(oi|olá|bom dia|boa tarde|boa noite)",
+        [
+            "Olá! Bem-vindo ao suporte técnico. Como posso te ajudar hoje?",
+            "Oi! Está enfrentando algum problema com seu dispositivo?",
+            "Saudações! Pronto para resolver seu problema tecnológico.",
+        ],
+    ],
+    [
+        r"(tchau|até mais|valeu|falou)",
+        [
+            "Se precisar de mais ajuda, é só chamar!",
+            "Até logo! Espero que tudo funcione bem por aí.",
+            "Valeu! Estaremos por aqui se precisar.",
+        ],
+    ],
+    [
+        r".*(internet.*lenta|wifi.*lento|conexão.*lenta).*",
+        [
+            "Tente reiniciar seu modem e verifique se não há muitos dispositivos conectados.",
+            "Você pode testar a velocidade em sites como speedtest.net e verificar se está condizente com seu plano.",
+        ],
+    ],
+    [
+        r".*(sem.*internet|caiu.*conexão|não.*conecta).*",
+        [
+            "Verifique se os cabos estão conectados corretamente e tente reiniciar o roteador.",
+            "Às vezes o problema é na operadora. Você pode ligar lá para confirmar se há manutenção na sua região.",
+        ],
+    ],
+    [
+        r".*(meu computador.*não liga|pc.*não liga).*",
+        [
+            "Verifique se o cabo de energia está conectado e se há sinal de energia no estabilizador ou tomada.",
+            "Tente segurar o botão de ligar por alguns segundos. Se não funcionar, pode ser um problema de hardware.",
+        ],
+    ],
+    [
+        r".*(impressora.*não funciona|não.*imprime|erro.*impressora).*",
+        [
+            "Verifique se a impressora está ligada, com papel e tinta, e conectada corretamente ao computador.",
+            "Você já tentou reinstalar o driver da impressora?",
+        ],
+    ],
+    [
+        r".*(esqueci.*senha|como.*trocar.*senha).*",
+        [
+            "Para redefinir a senha, acesse a opção 'Esqueci minha senha' na tela de login do serviço.",
+            "Verifique se o e-mail de recuperação está atualizado e siga os passos enviados.",
+        ],
+    ],
+    [
+        r".*(vírus|malware|computador.*lento).*",
+        [
+            "Recomendo rodar um antivírus confiável. Você pode usar o Windows Defender ou outro da sua preferência.",
+            "Evite instalar programas de fontes desconhecidas e mantenha seu sistema atualizado.",
+        ],
+    ],
+    [
+        r".*(problema.*áudio|sem.*som).*",
+        [
+            "Verifique se o volume está ativado e os cabos de áudio estão conectados corretamente.",
+            "Abra as configurações de som e veja se o dispositivo de saída está correto.",
+        ],
+    ],
+    [
+        r".*(tela.*azul|blue screen|erro.*sistema).*",
+        [
+            "A tela azul geralmente indica falha de hardware ou driver. Anote o código de erro e busque no site da Microsoft.",
+            "Tente inicializar em modo de segurança e verifique se há atualizações pendentes.",
+        ],
+    ],
+    [
+        r".*(como.*formatar|resetar.*pc).*",
+        [
+            "Você pode usar a ferramenta de restauração do sistema no painel de configurações.",
+            "Lembre-se de fazer backup dos seus arquivos antes de formatar o computador.",
+        ],
+    ],
+    [
+        r".*(não abre|app.*travando|programa.*erro).*",
+        [
+            "Tente reinstalar o aplicativo. Se o problema persistir, verifique se há atualizações disponíveis.",
+            "Limpar o cache ou reiniciar o sistema pode ajudar nesse caso.",
+        ],
+    ],
+    [
+        r".*(como.*fazer backup|salvar arquivos).*",
+        [
+            "Você pode usar serviços de nuvem como Google Drive ou OneDrive, ou copiar para um HD externo.",
+            "Organizar seus arquivos por pastas facilita muito na hora do backup!",
+        ],
+    ],
+    [
+        r".*(quais.*horários.*suporte|atendimento).*",
+        [
+            "Nosso suporte está disponível de segunda a sexta, das 8h às 18h.",
+            "Pode mandar mensagem a qualquer hora, mas respondemos mais rápido durante o expediente.",
+        ],
+    ],
+    [
+        r".*(problema.*e-?mail|email.*erro|não.*recebo.*email|não.*envio.*email).*",
+        [
+            "Verifique se você está conectado à internet e se as configurações do servidor de e-mail estão corretas.",
+            "Cheque a pasta de spam e se há espaço suficiente na sua conta para novos e-mails.",
+            "Se estiver usando um cliente de e-mail como Outlook ou Thunderbird, tente remover e adicionar a conta novamente.",
+        ],
+    ],
+]
+
+reflexoes_pt = {
+    "eu": "você",
+    "me": "te",
+    "meu": "seu",
+    "minha": "sua",
+    "meus": "seus",
+    "minhas": "suas",
+    "sou": "é",
+    "estou": "está",
+    "era": "era",
+    "fui": "foi",
+    "serei": "será",
+    "estive": "esteve",
+    "estava": "estava",
+    "estarei": "estará",
+    "você": "eu",
+    "vc": "eu",
+    "te": "me",
+    "seu": "meu",
+    "sua": "minha",
+    "seus": "meus",
+    "suas": "minhas",
+    "é": "sou",
+    "está": "estou",
+    "foi": "fui",
+    "será": "serei",
+    "esteve": "estive",
+    "estava": "estava",
+    "estará": "estarei",
+    "nós": "vocês",
+    "nosso": "seu",
+    "nossa": "sua",
+    "nossos": "seus",
+    "nossas": "suas",
+    "vocês": "nós",
+    "seus": "nossos",
+    "suas": "nossas",
+}
+
+chatbot = Chat(pares, reflexoes_pt)
 
 
-class ChatBot:
-    def __init__(self):
-        self.lemmatizer = WordNetLemmatizer()
-        self.responses = self._load_responses()
-        self.greetings = [
-            "olá",
-            "oi",
-            "e aí",
-            "bom dia",
-            "boa tarde",
-            "boa noite",
-        ]
-        self.farewell = ["tchau", "até logo", "adeus", "até mais", "até breve"]
-
-    def _load_responses(self):
-        return {
-            "internet": [
-                "Problemas com internet podem ser resolvidos reiniciando seu roteador. Você já tentou desligar e ligar novamente?",
-            ],
-            "senha": [
-                "Para redefinir sua senha, acesse a página de 'esqueci minha senha' no site de login.",
-            ],
-            "lento": [
-                "Computador lento pode ser sinal de pouco espaço no disco ou memória insuficiente. Tente fechar programas não utilizados.",
-            ],
-            "impressora": [
-                "Problemas com impressora geralmente são resolvidos reiniciando o dispositivo. Você já tentou desligar e ligar novamente?",
-            ],
-            "email": [
-                "Não está recebendo emails? Verifique sua pasta de spam ou lixo eletrônico.",
-            ],
-            "software": [
-                "Para reinstalar um software, primeiro desinstale a versão atual através do Painel de Controle/Configurações.",
-            ],
-            "hardware": [
-                "Problemas de hardware geralmente requerem uma inspeção física. Verifique se todos os cabos estão conectados corretamente.",
-            ],
-            "wifi": [
-                "Para melhorar o sinal WiFi, posicione o roteador em um local central, longe de paredes grossas e aparelhos eletrônicos.",
-            ],
-            "virus": [
-                "Para remover vírus, execute um antivírus completo no sistema. Mantenha seu antivírus sempre atualizado.",
-            ],
-            "ajuda": [
-                "Estou aqui para ajudar com problemas técnicos. Qual dificuldade você está enfrentando?",
-            ],
-            "default": [
-                "Não tenho certeza se entendi completamente seu problema. Pode fornecer mais detalhes?",
-                "Para melhor ajudá-lo, preciso de informações mais específicas sobre o problema que está enfrentando.",
-                "Hmm, isso é algo que posso precisar encaminhar para um especialista. Pode explicar melhor a situação?",
-            ],
-        }
-
-    def _parse_text(self, text: str) -> str:
-        text = text.lower()
-        text = "".join([char for char in text if char not in string.punctuation])
-        return text
-
-    def _tokenizer(self, text: str) -> List[str]:
-        return nltk.word_tokenize(text, language="portuguese")
-
-    def _lematizer(self, words: List[str]) -> List[str]:
-        return [self.lemmatizer.lemmatize(word) for word in words]
-
-    def _find_keyword(self, words: List[str]) -> str:
-        keyword = set(words)
-        for key in self.responses.keys():
-            if key in keyword:
-                return key
-
-        related_words = {
-            "internet": [
-                "conexão",
-                "rede",
-                "wifi",
-                "fibra",
-                "banda",
-                "larga",
-                "net",
-                "navegar",
-                "navegador",
-            ],
-            "wifi": ["wireless", "sem", "fio", "sinal", "rede", "roteador", "modem"],
-            "lento": [
-                "devagar",
-                "travando",
-                "travar",
-                "performance",
-                "desempenho",
-                "carregando",
-                "demorado",
-            ],
-            "impressora": [
-                "imprimir",
-                "scanner",
-                "digitalizar",
-                "tinta",
-                "cartucho",
-                "papel",
-                "imprimir",
-            ],
-            "email": [
-                "correio",
-                "eletrônico",
-                "gmail",
-                "outlook",
-                "hotmail",
-                "mensagem",
-                "caixa",
-                "entrada",
-            ],
-            "senha": [
-                "login",
-                "acesso",
-                "conta",
-                "entrar",
-                "cadastro",
-                "usuário",
-                "password",
-            ],
-            "software": [
-                "programa",
-                "aplicativo",
-                "app",
-                "sistema",
-                "windows",
-                "mac",
-                "instalar",
-                "desinstalar",
-            ],
-            "hardware": [
-                "equipamento",
-                "dispositivo",
-                "físico",
-                "peça",
-                "componente",
-                "placa",
-                "processador",
-            ],
-            "virus": [
-                "malware",
-                "trojan",
-                "spyware",
-                "infectado",
-                "antivírus",
-                "segurança",
-                "proteção",
-            ],
-        }
-
-        for categoria, terms in related_words.items():
-            for word in words:
-                if word in terms:
-                    return categoria
-
-        return "default"
-
-    def answer(self, text: str) -> str:
-        if not text:
-            return "Por favor, digite algo."
-
-        parsed_text = self._parse_text(text)
-        words = self._tokenizer(parsed_text)
-        words = self._lematizer(words)
-
-        for word in words:
-            if word in self.greetings:
-                return f"{random.choice(self.greetings).capitalize()}! Como posso ajudar hoje?"
-            if word in self.farewell:
-                return f"{random.choice(self.farewell).capitalize()}! Foi um prazer conversar com você."
-
-        keyword = self._find_keyword(words)
-        return random.choice(self.responses[keyword])
+def get_response(user_input):
+    resposta = chatbot.respond(user_input)
+    if resposta:
+        return resposta
+    else:
+        return (
+            "Desculpe, não entendi muito bem. Poderia reformular ou dar mais detalhes?"
+        )
