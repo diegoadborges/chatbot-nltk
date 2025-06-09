@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const messageContent = document.createElement("div");
     messageContent.classList.add("message-content");
-    messageContent.textContent = message;
+    messageContent.innerHTML = message;
 
     messageDiv.appendChild(messageContent);
     chatMessages.appendChild(messageDiv);
@@ -37,6 +37,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return typingDiv;
   }
 
+  function formatText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br>");
+  }
+
   /**
    * @param {string} message
    * */
@@ -56,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       chatMessages.removeChild(typingIndicator);
 
-      addMessage(data.response, false);
+      addMessage(formatText(data.response), false);
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error);
       chatMessages.removeChild(typingIndicator);
